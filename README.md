@@ -44,6 +44,10 @@ python3 -m venv .venv
   (paasiaisturnaus.torneopal.fi, `ilvesjp_0024`).
 - Tulos tulee muodossa `2–1` (en dash) ja normalisoidaan muotoon `2 - 1`.
   Pelattu-tila luetaan tuloksesta tai `li.match.played`-luokasta.
+- `games.json` säilyttää tuloksen sivuston virallisessa muodossa koti–vieras.
+  Sivu kääntää luvut vieraspeleissä Ilves-ensin, koska kortin otsikko on
+  "Ilves vs vastustaja". Kääntö tehdään vain puhtaalle `n - n` -tulokselle;
+  poikkeavat merkinnät näytetään sellaisenaan.
 - Päivämäärästä puuttuu vuosi, joten se päätellään valitsemalla ajallisesti
   lähin vaihtoehto kuluvasta, edellisestä ja seuraavasta vuodesta.
 

@@ -386,10 +386,20 @@
       "</div>";
   }
 
+  // games.json sisaltaa tuloksen sivuston muodossa koti-vieras. Kortin otsikko
+  // on "Ilves vs vastustaja", joten vieraspelissa luvut kaannetaan.
+  function resultIlvesFirst(game) {
+    var raw = game.result || "";
+    if (!raw || game.is_home) return raw;
+    var parts = /^(\d+)\s*-\s*(\d+)$/.exec(raw);
+    return parts ? parts[2] + " - " + parts[1] : raw;
+  }
+
   function gameCard(game) {
     var badgeClass = GIRLS.test(game.series) ? "badge girls" : "badge boys";
-    var right = game.result
-      ? '<div class="score">' + esc(game.result) + "</div>"
+    var score = resultIlvesFirst(game);
+    var right = score
+      ? '<div class="score">' + esc(score) + "</div>"
       : '<div class="pending">tulossa</div>';
     return '<article class="game">' +
         '<div class="' + badgeClass + '">' + esc(game.series) + "</div>" +
