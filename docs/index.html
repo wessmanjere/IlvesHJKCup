@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#00522C">
+<meta name="description" content="Ilveksen peliryhmien ottelut ja tulokset HJK Cupissa - kaikki yhdellä sivulla.">
+<title>Ilves HJK Cupissa</title>
+<link rel="icon" href="assets/ilves-logo.png">
+<link rel="apple-touch-icon" href="assets/ilves-logo.png">
+<style>
+  :root{
+    --green:#00522C;
+    --green-dark:#003D20;
+    --green-soft:#E6EEEA;
+    --yellow:#FFD200;
+    --yellow-soft:#FFF3B8;
+    --ink:#16211B;
+    --muted:#6B7A72;
+    --bg:#F3F5F3;
+    --card:#FFFFFF;
+    --line:#E4E9E5;
+    --radius:16px;
+    --shadow:0 1px 2px rgba(0,0,0,.05), 0 4px 14px rgba(0,40,20,.06);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size:17px;
+    line-height:1.4;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:0 14px 48px}
+
+  /* ---- Yläpalkki ---- */
+  header{
+    background:var(--green);
+    padding:calc(16px + env(safe-area-inset-top)) 14px 16px;
+  }
+  .header-inner{
+    max-width:640px;margin:0 auto;
+    display:flex;align-items:center;gap:14px;
+  }
+  .logo-badge{
+    flex:0 0 auto;
+    width:60px;height:60px;border-radius:50%;
+    background:var(--yellow);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.18);
+  }
+  .logo-badge img{width:46px;height:46px;object-fit:contain;display:block}
+  header h1{
+    margin:0;
+    font-size:1.4rem;line-height:1.15;
+    color:var(--yellow);
+    letter-spacing:-.01em;
+  }
+  header p{
+    margin:3px 0 0;
+    font-size:.86rem;
+    color:rgba(255,255,255,.78);
+  }
+
+  /* ---- Suodattimet ---- */
+  .filters{
+    position:sticky;top:0;z-index:10;
+    background:var(--bg);
+    border-bottom:1px solid var(--line);
+    padding:10px 0 9px;
+  }
+  .filters-scroll{
+    max-width:640px;margin:0 auto;
+    display:flex;gap:8px;
+    overflow-x:auto;
+    padding:0 14px;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+  }
+  .filters-scroll::-webkit-scrollbar{display:none}
+  .chip{
+    flex:0 0 auto;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--muted);
+    font:inherit;font-size:.94rem;font-weight:600;
+    padding:8px 16px;
+    border-radius:999px;
+    cursor:pointer;
+    white-space:nowrap;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .chip[aria-pressed="true"]{
+    background:var(--green);
+    border-color:var(--green);
+    color:var(--yellow);
+  }
+
+  /* ---- Päivitysrivi ---- */
+  .updated{
+    margin:12px 2px 12px;
+    font-size:.8rem;
+    color:var(--muted);
+  }
+
+  /* ---- Seuraavaksi pelissä ---- */
+  .next{
+    background:var(--yellow);
+    border-radius:var(--radius);
+    padding:16px 18px;
+    margin-bottom:22px;
+    box-shadow:var(--shadow);
+  }
+  .next .label{
+    font-size:.72rem;
+    font-weight:800;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--green);
+    opacity:.85;
+  }
+  .next .teams{
+    margin:6px 0 0;
+    font-size:1.22rem;
+    font-weight:800;
+    color:var(--green-dark);
+    letter-spacing:-.01em;
+  }
+  .next .meta{
+    margin-top:8px;
+    display:flex;flex-wrap:wrap;gap:6px 14px;
+    font-size:.92rem;
+    font-weight:600;
+    color:#3A4A3F;
+  }
+  .next .meta span{display:inline-flex;align-items:center;gap:5px}
+  .next .when{
+    margin-top:10px;
+    font-size:.8rem;
+    font-weight:700;
+    color:var(--green);
+    opacity:.8;
+  }
+
+  /* ---- Päiväotsikko ---- */
+  h2.day{
+    margin:24px 2px 10px;
+    font-size:.98rem;
+    font-weight:800;
+    color:var(--green);
+    letter-spacing:.01em;
+  }
+  h2.day:first-of-type{margin-top:6px}
+
+  /* ---- Pelikortti ---- */
+  .game{
+    display:flex;align-items:center;gap:12px;
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:12px 14px;
+    margin-bottom:10px;
+    box-shadow:var(--shadow);
+  }
+  .badge{
+    flex:0 0 auto;
+    min-width:52px;
+    text-align:center;
+    padding:7px 8px;
+    border-radius:12px;
+    font-size:.82rem;
+    font-weight:800;
+    letter-spacing:.01em;
+  }
+  .badge.boys{background:var(--green);color:var(--yellow)}
+  .badge.girls{background:var(--yellow);color:var(--green-dark)}
+  .game-main{flex:1 1 auto;min-width:0}
+  .game-teams{
+    font-size:1.03rem;
+    font-weight:700;
+    letter-spacing:-.01em;
+    overflow-wrap:anywhere;
+  }
+  .game-meta{
+    margin-top:3px;
+    display:flex;flex-wrap:wrap;gap:2px 12px;
+    font-size:.84rem;
+    color:var(--muted);
+  }
+  .game-meta span{display:inline-flex;align-items:center;gap:4px;min-width:0}
+  .game-meta .venue{overflow-wrap:anywhere}
+  .ha{
+    font-size:.72rem;font-weight:700;
+    padding:1px 7px;border-radius:999px;
+    background:var(--green-soft);color:var(--green);
+  }
+  .game-result{
+    flex:0 0 auto;
+    text-align:right;
+    font-variant-numeric:tabular-nums;
+  }
+  .game-result .score{
+    font-size:1.1rem;font-weight:800;color:var(--green);white-space:nowrap;
+  }
+  .game-result .pending{
+    font-size:.82rem;font-weight:600;color:#9AA8A0;white-space:nowrap;
+  }
+
+  .icon{width:14px;height:14px;flex:0 0 auto;opacity:.75}
+  .next .icon{opacity:.7}
+
+  .note{
+    background:#FFF8E1;
+    border:1px solid #F2E0A0;
+    color:#6B5A10;
+    border-radius:12px;
+    padding:10px 12px;
+    font-size:.84rem;
+    margin-bottom:16px;
+  }
+  .empty{
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:22px 18px;
+    text-align:center;
+    color:var(--muted);
+    box-shadow:var(--shadow);
+  }
+  footer{
+    margin-top:28px;
+    text-align:center;
+    font-size:.78rem;
+    color:var(--muted);
+  }
+  footer a{color:var(--green)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-badge"><img src="assets/ilves-logo.png" alt="Ilves"></div>
+    <div>
+      <h1>Ilves HJK Cupissa</h1>
+      <p>Kaikki peliryhmät yhdellä sivulla</p>
+    </div>
+  </div>
+</header>
+
+<nav class="filters" aria-label="Ikäluokkasuodatin">
+  <div class="filters-scroll" id="filters"></div>
+</nav>
+
+<main class="wrap">
+  <div class="updated" id="updated">Ladataan pelejä…</div>
+  <div id="notes"></div>
+  <div id="next"></div>
+  <div id="list"></div>
+  <footer>
+    Tiedot haetaan automaattisesti <a href="https://hjkcup.fi/" target="_blank" rel="noopener">hjkcup.fi</a>-sivustolta.
+  </footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var GIRLS = /^TU/;
+  var DAYS = ["Sunnuntai","Maanantai","Tiistai","Keskiviikko","Torstai","Perjantai","Lauantai"];
+  var ICONS = {
+    clock: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3.2 2"/></svg>',
+    pin: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>',
+    tag: '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12V5a1 1 0 0 1 1-1h7l8 8-8 8-8-8z"/><circle cx="8.2" cy="8.2" r="1.2" fill="currentColor" stroke="none"/></svg>'
+  };
+
+  var state = { data: null, filter: "Kaikki" };
+
+  var elFilters = document.getElementById("filters");
+  var elUpdated = document.getElementById("updated");
+  var elNotes = document.getElementById("notes");
+  var elNext = document.getElementById("next");
+  var elList = document.getElementById("list");
+
+  function esc(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  function parseDateTime(game) {
+    if (!game.date_iso) return null;
+    var parts = game.date_iso.split("-");
+    var time = (game.time || "00:00").split(":");
+    var date = new Date(
+      Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]),
+      Number(time[0]) || 0, Number(time[1]) || 0
+    );
+    return isNaN(date.getTime()) ? null : date;
+  }
+
+  function dayHeading(iso) {
+    var parts = iso.split("-");
+    var date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    return DAYS[date.getDay()] + " " + date.getDate() + "." + (date.getMonth() + 1) + ".";
+  }
+
+  function sameDay(a, b) {
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  }
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+
+  function updatedText(iso) {
+    var date = new Date(iso);
+    if (isNaN(date.getTime())) return "Päivitetty äskettäin";
+    var clock = "klo " + pad(date.getHours()) + "." + pad(date.getMinutes());
+    var now = new Date();
+    var yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+    if (sameDay(date, now)) return "Päivitetty tänään " + clock;
+    if (sameDay(date, yesterday)) return "Päivitetty eilen " + clock;
+    return "Päivitetty " + date.getDate() + "." + (date.getMonth() + 1) + ". " + clock;
+  }
+
+  function relativeWhen(date) {
+    if (!date) return "";
+    var now = new Date();
+    var minutes = Math.round((date - now) / 60000);
+    if (minutes < -5) return "Käynnissä tai juuri pelattu";
+    if (minutes <= 0) return "Alkaa nyt";
+    if (minutes < 60) return "Alkaa " + minutes + " min kuluttua";
+    var tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    var clock = pad(date.getHours()) + "." + pad(date.getMinutes());
+    if (sameDay(date, now)) {
+      var hours = Math.floor(minutes / 60);
+      return "Tänään klo " + clock + " (" + hours + " h " + (minutes % 60) + " min)";
+    }
+    if (sameDay(date, tomorrow)) return "Huomenna klo " + clock;
+    return dayHeading(date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate())) + " klo " + clock;
+  }
+
+  function visibleGames() {
+    var games = (state.data && state.data.games) || [];
+    if (state.filter === "Kaikki") return games;
+    return games.filter(function (game) { return game.series === state.filter; });
+  }
+
+  function renderFilters() {
+    var order = (state.data && state.data.series_order) || [];
+    var keys = ["Kaikki"].concat(order);
+    elFilters.innerHTML = keys.map(function (key) {
+      return '<button type="button" class="chip" data-series="' + esc(key) + '" aria-pressed="' +
+        (state.filter === key ? "true" : "false") + '">' + esc(key) + "</button>";
+    }).join("");
+  }
+
+  function renderNext(games) {
+    var now = new Date();
+    var upcoming = games.filter(function (game) { return !game.played; })
+      .map(function (game) { return { game: game, at: parseDateTime(game) }; })
+      .sort(function (a, b) {
+        if (!a.at) return 1;
+        if (!b.at) return -1;
+        return a.at - b.at;
+      });
+
+    var pick = null;
+    for (var i = 0; i < upcoming.length; i++) {
+      if (upcoming[i].at && upcoming[i].at.getTime() > now.getTime() - 45 * 60000) { pick = upcoming[i]; break; }
+    }
+    if (!pick && upcoming.length) pick = upcoming[0];
+
+    if (!pick) {
+      elNext.innerHTML = '<div class="next"><div class="label">Seuraavaksi pelissä</div>' +
+        '<div class="teams">Kaikki pelit pelattu</div></div>';
+      return;
+    }
+
+    var game = pick.game;
+    elNext.innerHTML =
+      '<div class="next">' +
+        '<div class="label">Seuraavaksi pelissä</div>' +
+        '<div class="teams">Ilves vs ' + esc(game.opponent) + "</div>" +
+        '<div class="meta">' +
+          "<span>" + ICONS.tag + esc(game.series) + "</span>" +
+          "<span>" + ICONS.clock + esc(game.time || "aika avoin") + "</span>" +
+          (game.venue ? "<span>" + ICONS.pin + esc(game.venue) + "</span>" : "") +
+        "</div>" +
+        (pick.at ? '<div class="when">' + esc(relativeWhen(pick.at)) + "</div>" : "") +
+      "</div>";
+  }
+
+  function gameCard(game) {
+    var badgeClass = GIRLS.test(game.series) ? "badge girls" : "badge boys";
+    var right = game.played
+      ? '<div class="score">' + esc(game.result) + "</div>"
+      : '<div class="pending">tulossa</div>';
+    return '<article class="game">' +
+        '<div class="' + badgeClass + '">' + esc(game.series) + "</div>" +
+        '<div class="game-main">' +
+          '<div class="game-teams">Ilves vs ' + esc(game.opponent) + "</div>" +
+          '<div class="game-meta">' +
+            "<span>" + ICONS.clock + esc(game.time || "–") + "</span>" +
+            (game.venue ? '<span class="venue">' + ICONS.pin + esc(game.venue) + "</span>" : "") +
+            '<span class="ha">' + (game.is_home ? "Koti" : "Vieras") + "</span>" +
+          "</div>" +
+        "</div>" +
+        '<div class="game-result">' + right + "</div>" +
+      "</article>";
+  }
+
+  function renderList(games) {
+    if (!games.length) {
+      elList.innerHTML = '<div class="empty">Tälle ryhmälle ei löytynyt pelejä.</div>';
+      return;
+    }
+    var html = "";
+    var currentDay = null;
+    games.forEach(function (game) {
+      var key = game.date_iso || game.date || "";
+      if (key !== currentDay) {
+        currentDay = key;
+        html += '<h2 class="day">' + esc(game.date_iso ? dayHeading(game.date_iso) : (game.date || "Ajankohta avoin")) + "</h2>";
+      }
+      html += gameCard(game);
+    });
+    elList.innerHTML = html;
+  }
+
+  function renderNotes() {
+    var series = (state.data && state.data.series) || {};
+    var stale = Object.keys(series).filter(function (key) { return series[key] && series[key].ok === false; });
+    if (!stale.length) { elNotes.innerHTML = ""; return; }
+    elNotes.innerHTML = '<div class="note">Näiden ryhmien tiedot eivät päivittyneet viime haussa: <strong>' +
+      esc(stale.join(", ")) + "</strong>. Näytetään aiemmin haetut tiedot.</div>";
+  }
+
+  function render() {
+    var games = visibleGames();
+    renderFilters();
+    elUpdated.textContent = updatedText(state.data.updated_at);
+    renderNotes();
+    renderNext(games);
+    renderList(games);
+  }
+
+  elFilters.addEventListener("click", function (event) {
+    var button = event.target.closest(".chip");
+    if (!button) return;
+    state.filter = button.getAttribute("data-series");
+    render();
+    button.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
+  });
+
+  fetch("data/games.json?t=" + Date.now(), { cache: "no-store" })
+    .then(function (response) {
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      return response.json();
+    })
+    .then(function (data) {
+      state.data = data;
+      render();
+    })
+    .catch(function (error) {
+      elUpdated.textContent = "";
+      elList.innerHTML = '<div class="empty">Pelitietoja ei saatu ladattua.<br>' + esc(error.message) + "</div>";
+    });
+
+  // pidetään "alkaa x min kuluttua" ajan tasalla
+  setInterval(function () { if (state.data) renderNext(visibleGames()); }, 60000);
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden && state.data) renderNext(visibleGames());
+  });
+})();
+</script>
+</body>
+</html>
