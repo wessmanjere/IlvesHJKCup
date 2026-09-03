@@ -130,15 +130,16 @@ def parse_date(raw: str, today: dt.date) -> str | None:
     day, month, year = int(match.group(1)), int(match.group(2)), match.group(3)
     if year:
         return f"{int(year):04d}-{month:02d}-{day:02d}"
-    for candidate in (today.year, today.year + 1, today.year - 1):
+    candidates = []
+    for year_candidate in (today.year - 1, today.year, today.year + 1):
         try:
-            date = dt.date(candidate, month, day)
+            candidates.append(dt.date(year_candidate, month, day))
         except ValueError:
             continue
-        # turnauspaivat ovat lahitulevaisuudessa tai juuri menneet
-        if -120 <= (date - today).days <= 245:
-            return date.isoformat()
-    return None
+    if not candidates:
+        return None
+    # sivu ei kerro vuotta, joten valitaan ajallisesti lahin vaihtoehto
+    return min(candidates, key=lambda date: abs((date - today).days)).isoformat()
 
 
 def split_time_and_result(raw: str) -> tuple[str, str]:
@@ -166,11 +167,17 @@ def parse_games(html: str, series: str, today: dt.date) -> list[dict[str, Any]]:
     seen: set[str] = set()
 
     for item in soup.select("ul.matchlist li.match"):
-        def cell(name: str) -> str:
-            return clean_text(item.select_one(f"div.{name}"))
+        def cell(*names: str) -> str:
+            # taso-asennukset kayttavat eri luokkanimia (esim. ml_pvm /
+            # ml_pvmsiisti), joten kokeillaan vaihtoehdot jarjestyksessa
+            for name in names:
+                node = item.select_one(f"div.{name}")
+                if node is not None:
+                    return clean_text(node)
+            return ""
 
-        home = cell("ml_kotisiisti")
-        away = cell("ml_vierassiisti")
+        home = cell("ml_kotisiisti", "ml_koti")
+        away = cell("ml_vierassiisti", "ml_vieras")
         if not home or not away:
             continue
         is_home = CLUB_MATCH in home.lower()
@@ -191,8 +198,10 @@ def parse_games(html: str, series: str, today: dt.date) -> list[dict[str, Any]]:
             continue
         seen.add(key)
 
-        raw_date = cell("ml_pvm")
+        raw_date = cell("ml_pvm", "ml_pvmsiisti")
         kickoff, result = split_time_and_result(cell("ml_tulosklo"))
+        # uudemmat taso-versiot merkitsevat pelatun ottelun li-luokkaan
+        played = bool(result) or "played" in (item.get("class") or [])
         games.append(
             {
                 "id": key,
@@ -202,13 +211,13 @@ def parse_games(html: str, series: str, today: dt.date) -> list[dict[str, Any]]:
                 "date": raw_date,
                 "date_iso": parse_date(raw_date, today),
                 "time": kickoff,
-                "venue": cell("ml_kenttanimi"),
+                "venue": cell("ml_kenttanimi", "ml_kentta"),
                 "home": home,
                 "away": away,
                 "opponent": away if is_home else home,
                 "is_home": is_home,
                 "result": result,
-                "played": bool(result),
+                "played": played,
                 "url": requests.compat.urljoin("https://hjkcup.fi/taso/", href) if href else "",
             }
         )

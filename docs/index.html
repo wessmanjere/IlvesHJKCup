@@ -388,7 +388,7 @@
 
   function gameCard(game) {
     var badgeClass = GIRLS.test(game.series) ? "badge girls" : "badge boys";
-    var right = game.played
+    var right = game.result
       ? '<div class="score">' + esc(game.result) + "</div>"
       : '<div class="pending">tulossa</div>';
     return '<article class="game">' +

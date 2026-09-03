@@ -37,6 +37,15 @@ python3 -m venv .venv
   sivulla näytetään huomautus. Koko ajo ei kaadu.
 - Sivusto näyttää pelatun ottelun tuloksen kellonajan tilalla, joten scraper
   säilyttää aiemmin haetun alkamisajan tuloksen rinnalla.
+- Eri taso-asennukset käyttävät eri luokkanimiä samoille kentille
+  (`ml_pvm` / `ml_pvmsiisti`, `ml_kenttanimi` / `ml_kentta`), joten parsinta
+  kokeilee vaihtoehdot järjestyksessä. Testattu sekä pelaamattomia otteluita
+  vasten (hjkcup.fi) että pelattuja vasten
+  (paasiaisturnaus.torneopal.fi, `ilvesjp_0024`).
+- Tulos tulee muodossa `2–1` (en dash) ja normalisoidaan muotoon `2 - 1`.
+  Pelattu-tila luetaan tuloksesta tai `li.match.played`-luokasta.
+- Päivämäärästä puuttuu vuosi, joten se päätellään valitsemalla ajallisesti
+  lähin vaihtoehto kuluvasta, edellisestä ja seuraavasta vuodesta.
 
 ## Päivitystahti
 
