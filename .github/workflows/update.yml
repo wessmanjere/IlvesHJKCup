@@ -2,9 +2,20 @@ name: Päivitä pelitiedot
 
 on:
   schedule:
-    # 10 minuutin välein. GitHub voi viivästyttää ajoa ruuhka-aikoina.
-    - cron: "*/10 * * * *"
+    # 5 minuuttia on GitHubin lyhyin sallittu cron-vali. Jokainen ajo kiertaa
+    # sisaisesti 2 minuutin valein, joten haku tapahtuu 2 minuutin tahdissa
+    # myos silloin kun GitHub viivastyttaa cronia.
+    - cron: "*/5 * * * *"
   workflow_dispatch:
+    inputs:
+      interval_seconds:
+        description: "Hakuvali sekunteina"
+        required: false
+        default: "120"
+      duration_minutes:
+        description: "Kuinka kauan yksi ajo kiertaa (minuuttia)"
+        required: false
+        default: "9"
   push:
     paths:
       - "scraper/**"
@@ -15,12 +26,16 @@ permissions:
 
 concurrency:
   group: update-games
-  cancel-in-progress: false
+  # uusi cron-ajo korvaa edellisen silmukan, jottei jonoon kerry ajoja
+  cancel-in-progress: true
 
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+    env:
+      INTERVAL_SECONDS: ${{ github.event.inputs.interval_seconds || '120' }}
+      DURATION_MINUTES: ${{ github.event.inputs.duration_minutes || '9' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -33,17 +48,46 @@ jobs:
       - name: Asenna riippuvuudet
         run: pip install -r scraper/requirements.txt
 
-      - name: Hae pelit
-        run: python scraper/fetch_games.py
-
-      - name: Committaa muutokset
+      - name: Hae pelit 2 minuutin valein ja committaa muutokset
         run: |
-          if [ -z "$(git status --porcelain docs/data/games.json)" ]; then
-            echo "Ei muutoksia pelitiedoissa."
-            exit 0
-          fi
+          set -u
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data/games.json
-          git commit -m "Päivitä pelitiedot $(date -u '+%Y-%m-%d %H:%M UTC')"
-          git push
+
+          interval="$INTERVAL_SECONDS"
+          deadline=$(( $(date +%s) + DURATION_MINUTES * 60 ))
+          round=0
+
+          while :; do
+            round=$(( round + 1 ))
+            echo "::group::Kierros $round ($(date -u '+%H:%M:%S UTC'))"
+
+            # yksittainen epaonnistunut haku ei katkaise silmukkaa
+            python scraper/fetch_games.py || echo "Haku epaonnistui, jatketaan seuraavalla kierroksella."
+
+            if [ -n "$(git status --porcelain docs/data/games.json)" ]; then
+              git add docs/data/games.json
+              git commit -q -m "Päivitä pelitiedot $(date -u '+%Y-%m-%d %H:%M UTC')"
+              pushed=0
+              for attempt in 1 2 3; do
+                if git pull --rebase --autostash -q origin "$GITHUB_REF_NAME" && git push -q; then
+                  pushed=1
+                  echo "Muutokset pushattu."
+                  break
+                fi
+                echo "Push epaonnistui (yritys $attempt), yritetaan uudelleen."
+                sleep 5
+              done
+              [ "$pushed" -eq 1 ] || echo "Pushia ei saatu lapi, seuraava kierros yrittaa uudelleen."
+            else
+              echo "Ei muutoksia pelitiedoissa."
+            fi
+
+            echo "::endgroup::"
+
+            if [ $(( $(date +%s) + interval )) -gt "$deadline" ]; then
+              echo "Ajon kesto tayttyi, seuraava cron-ajo jatkaa."
+              break
+            fi
+            sleep "$interval"
+          done
