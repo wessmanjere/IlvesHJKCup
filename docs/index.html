@@ -106,7 +106,7 @@
     color:var(--muted);
   }
 
-  /* ---- Seuraavaksi pelissä ---- */
+  /* ---- Seuraavaksi pelaa ---- */
   .next{
     background:var(--yellow);
     border-radius:var(--radius);
@@ -191,11 +191,6 @@
   }
   .game-meta span{display:inline-flex;align-items:center;gap:4px;min-width:0}
   .game-meta .venue{overflow-wrap:anywhere}
-  .ha{
-    font-size:.72rem;font-weight:700;
-    padding:1px 7px;border-radius:999px;
-    background:var(--green-soft);color:var(--green);
-  }
   .game-result{
     flex:0 0 auto;
     text-align:right;
@@ -243,7 +238,7 @@
   <div class="header-inner">
     <div class="logo-badge"><img src="assets/ilves-logo.png" alt="Ilves"></div>
     <div>
-      <h1>Ilves HJK Cupissa</h1>
+      <h1>Ilves peliryhmät HJK cupissa.</h1>
       <p>Kaikki peliryhmät yhdellä sivulla</p>
     </div>
   </div>
@@ -372,7 +367,7 @@
     if (!pick && upcoming.length) pick = upcoming[0];
 
     if (!pick) {
-      elNext.innerHTML = '<div class="next"><div class="label">Seuraavaksi pelissä</div>' +
+      elNext.innerHTML = '<div class="next"><div class="label">Seuraavaksi pelaa</div>' +
         '<div class="teams">Kaikki pelit pelattu</div></div>';
       return;
     }
@@ -380,7 +375,7 @@
     var game = pick.game;
     elNext.innerHTML =
       '<div class="next">' +
-        '<div class="label">Seuraavaksi pelissä</div>' +
+        '<div class="label">Seuraavaksi pelaa</div>' +
         '<div class="teams">Ilves vs ' + esc(game.opponent) + "</div>" +
         '<div class="meta">' +
           "<span>" + ICONS.tag + esc(game.series) + "</span>" +
@@ -403,7 +398,6 @@
           '<div class="game-meta">' +
             "<span>" + ICONS.clock + esc(game.time || "–") + "</span>" +
             (game.venue ? '<span class="venue">' + ICONS.pin + esc(game.venue) + "</span>" : "") +
-            '<span class="ha">' + (game.is_home ? "Koti" : "Vieras") + "</span>" +
           "</div>" +
         "</div>" +
         '<div class="game-result">' + right + "</div>" +
