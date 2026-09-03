@@ -2,10 +2,20 @@ name: Päivitä pelitiedot
 
 on:
   schedule:
-    # 5 minuutin valein. Tama on GitHubin lyhyin sallittu cron-vali; GitHub voi
-    # viivastyttaa ajoa ruuhka-aikoina.
+    # GitHubin cron on "best effort" eika laukea luotettavasti tiheilla
+    # valeilla, joten cron vain kaynnistaa ajon ja ajo itse kiertaa 5 minuutin
+    # valein. Nain paivitys jatkuu vaikka cron laukeaisi vain kerran tunnissa.
     - cron: "*/5 * * * *"
   workflow_dispatch:
+    inputs:
+      interval_seconds:
+        description: "Hakuvali sekunteina"
+        required: false
+        default: "300"
+      duration_minutes:
+        description: "Kuinka kauan yksi ajo kiertaa (minuuttia, enintaan 350)"
+        required: false
+        default: "50"
   push:
     paths:
       - "scraper/**"
@@ -16,12 +26,16 @@ permissions:
 
 concurrency:
   group: update-games
-  cancel-in-progress: false
+  # uusi kaynnistys korvaa edellisen silmukan, jottei jonoon kerry ajoja
+  cancel-in-progress: true
 
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 355
+    env:
+      INTERVAL_SECONDS: ${{ github.event.inputs.interval_seconds || '300' }}
+      DURATION_MINUTES: ${{ github.event.inputs.duration_minutes || '50' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -34,46 +48,73 @@ jobs:
       - name: Asenna riippuvuudet
         run: pip install -r scraper/requirements.txt
 
-      - name: Hae pelit
-        run: python scraper/fetch_games.py
-
-      - name: Committaa muutokset
+      - name: Hae pelit ja committaa muutokset
         run: |
-          set -eu
-          if [ -z "$(git status --porcelain docs/data/games.json)" ]; then
-            echo "Ei muutoksia pelitiedoissa."
-            exit 0
-          fi
+          set -u
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # tuoreimman haun tulos on aina oikea versio, joten rinnakkainen ajo
+          # Committaa ja pushaa tuoreimman haun tulos. Rinnakkainen ajo
           # ratkaistaan siirtymalla originin paalle ja kirjoittamalla tiedosto
-          # uudelleen - nain rebase-konflikti ei voi jumittaa ajoa
-          cp docs/data/games.json "$RUNNER_TEMP/games.json"
-
-          for attempt in 1 2 3; do
-            git fetch -q origin "$GITHUB_REF_NAME"
-            git reset -q --hard "origin/$GITHUB_REF_NAME"
-            cp "$RUNNER_TEMP/games.json" docs/data/games.json
-
+          # uudelleen, jottei rebase-konflikti voi jumittaa ajoa.
+          push_games() {
             if [ -z "$(git status --porcelain docs/data/games.json)" ]; then
-              echo "Ei muutoksia pelitiedoissa (toinen ajo ehti ensin)."
-              exit 0
+              echo "Ei muutoksia pelitiedoissa."
+              return 1
             fi
 
-            git add docs/data/games.json
-            git commit -q -m "Päivitä pelitiedot $(date -u '+%Y-%m-%d %H:%M UTC')"
+            cp docs/data/games.json "$RUNNER_TEMP/games.json"
 
-            if git push -q; then
-              echo "Muutokset pushattu (yritys $attempt)."
-              exit 0
+            for attempt in 1 2 3; do
+              git fetch -q origin "$GITHUB_REF_NAME"
+              git reset -q --hard "origin/$GITHUB_REF_NAME"
+              cp "$RUNNER_TEMP/games.json" docs/data/games.json
+
+              if [ -z "$(git status --porcelain docs/data/games.json)" ]; then
+                echo "Ei muutoksia pelitiedoissa (toinen ajo ehti ensin)."
+                return 1
+              fi
+
+              git add docs/data/games.json
+              git commit -q -m "Päivitä pelitiedot $(date -u '+%Y-%m-%d %H:%M UTC')"
+
+              if git push -q; then
+                echo "Muutokset pushattu (yritys $attempt)."
+                return 0
+              fi
+
+              echo "Push epaonnistui (yritys $attempt), yritetaan uudelleen."
+              sleep 5
+            done
+
+            echo "::warning::Pushaus ei onnistunut kolmella yrityksella, seuraava kierros yrittaa uudelleen."
+            return 1
+          }
+
+          interval="$INTERVAL_SECONDS"
+          deadline=$(( $(date +%s) + DURATION_MINUTES * 60 ))
+          rounds=0
+          pushes=0
+
+          while :; do
+            rounds=$(( rounds + 1 ))
+            echo "::group::Kierros $rounds ($(date -u '+%H:%M:%S UTC'))"
+
+            # yksittainen epaonnistunut haku ei katkaise silmukkaa
+            if python scraper/fetch_games.py; then
+              if push_games; then
+                pushes=$(( pushes + 1 ))
+              fi
+            else
+              echo "Haku epaonnistui, jatketaan seuraavalla kierroksella."
             fi
 
-            echo "Push epaonnistui (yritys $attempt), yritetaan uudelleen."
-            sleep 5
+            echo "::endgroup::"
+
+            if [ $(( $(date +%s) + interval )) -gt "$deadline" ]; then
+              echo "Ajo valmis: $rounds kierrosta, $pushes pushia."
+              break
+            fi
+            sleep "$interval"
           done
-
-          echo "::error::Pelitietojen pushaus ei onnistunut kolmella yrityksella."
-          exit 1

@@ -53,10 +53,24 @@ python3 -m venv .venv
 
 ## Päivitystahti
 
-Haku pyörii cronilla 5 minuutin välein — se on GitHub Actionsin lyhyin sallittu
-cron-väli. Käytännössä GitHub jonottaa cron-ajoja ruuhka-aikoina, joten todellinen
-väli voi ajoittain venyä. Turnauspäivinä haun voi käynnistää käsin *Run workflow*
--napista.
+Haku pyörii 5 minuutin välein. GitHubin cron **ei** yksin riitä tähän: se on
+"best effort" eikä laukea luotettavasti tiheillä väleillä — tässä repossa se ei
+lauennut kertaakaan ensimmäisen 95 minuutin aikana. Siksi workflow ei luota
+croniin:
 
-Commit syntyy vain kun `docs/data/games.json` on muuttunut, joten tyhjät ajot eivät
-kerrytä historiaa.
+- cron `*/5 * * * *` **käynnistää** ajon aina kun GitHub sen laukaisee,
+- yksi ajo **kiertää itse 5 minuutin välein** enintään 50 minuuttia,
+- `concurrency: cancel-in-progress: true` varmistaa, että uusi käynnistys
+  korvaa edellisen silmukan eikä jonoon kerry ajoja.
+
+Näin päivitys jatkuu 5 minuutin tahdissa vaikka cron laukeaisi vain kerran
+tunnissa — tai vaikka ei lainkaan, kun ajo käynnistetään käsin.
+
+### Turnauspäivä
+
+Käynnistä ajo käsin *Run workflow* -napista ja anna `duration_minutes`-kentälle
+esim. `350`. Yksi käynnistys kattaa silloin lähes kuusi tuntia yhtäjaksoista
+5 minuutin päivitystä (Actionsin jobin enimmäiskesto on 6 h).
+
+Commit syntyy joka kierroksella, koska `games.json` sisältää hakuaikaleiman.
+Sivun "Päivitetty"-rivi kertoo siis todella milloin tiedot on haettu.
