@@ -206,6 +206,33 @@
   .icon{width:14px;height:14px;flex:0 0 auto;opacity:.75}
   .next .icon{opacity:.7}
 
+  .playoffs{
+    background:var(--green-soft);
+    border:1px solid #CBDBD2;
+    border-radius:var(--radius);
+    padding:14px 16px;
+    margin-bottom:20px;
+  }
+  .playoffs .label{
+    font-size:.72rem;font-weight:800;
+    letter-spacing:.1em;text-transform:uppercase;
+    color:var(--green);
+  }
+  .playoffs .row{
+    margin-top:7px;
+    font-size:.98rem;font-weight:700;
+    color:var(--green-dark);
+  }
+  .playoffs .row .clock{font-weight:600;color:#3A4A3F}
+  .playoffs .hint{
+    margin-top:8px;
+    font-size:.82rem;color:#54655B;
+  }
+  .open-opponent{
+    color:var(--muted);
+    font-weight:600;
+  }
+  .game-meta .tbd{color:var(--green);font-weight:600}
   .note{
     background:#FFF8E1;
     border:1px solid #F2E0A0;
@@ -252,6 +279,7 @@
   <div class="updated" id="updated">Ladataan pelejä…</div>
   <div id="notes"></div>
   <div id="next"></div>
+  <div id="playoffs"></div>
   <div id="list"></div>
   <footer>
     Tiedot haetaan automaattisesti <a href="https://hjkcup.fi/" target="_blank" rel="noopener">hjkcup.fi</a>-sivustolta.
@@ -275,6 +303,7 @@
   var elFilters = document.getElementById("filters");
   var elUpdated = document.getElementById("updated");
   var elNotes = document.getElementById("notes");
+  var elPlayoffs = document.getElementById("playoffs");
   var elNext = document.getElementById("next");
   var elList = document.getElementById("list");
 
@@ -367,8 +396,17 @@
     if (!pick && upcoming.length) pick = upcoming[0];
 
     if (!pick) {
-      elNext.innerHTML = '<div class="next"><div class="label">Seuraavaksi pelaa</div>' +
-        '<div class="teams">Kaikki pelit pelattu</div></div>';
+      // R5: lohkovaihe pelattu mutta jatko-ottelu ei vielä vahvistunut
+      var waiting = pendingPlayoffs();
+      var body = waiting.length
+        ? '<div class="teams">Jatko-ottelu ratkeaa</div><div class="meta"><span>' +
+            ICONS.tag + esc(waiting.map(function (p) { return p.series; }).join(", ")) +
+          "</span>" +
+          (waiting[0].dates.length
+            ? "<span>" + ICONS.clock + esc(dayHeading(waiting[0].dates[0])) + "</span>"
+            : "") + "</div>"
+        : '<div class="teams">Kaikki pelit pelattu</div>';
+      elNext.innerHTML = '<div class="next"><div class="label">Seuraavaksi pelaa</div>' + body + "</div>";
       return;
     }
 
@@ -376,14 +414,30 @@
     elNext.innerHTML =
       '<div class="next">' +
         '<div class="label">Seuraavaksi pelaa</div>' +
-        '<div class="teams">Ilves vs ' + esc(game.opponent) + "</div>" +
+        '<div class="teams">' + teamsText(game) + "</div>" +
         '<div class="meta">' +
           "<span>" + ICONS.tag + esc(game.series) + "</span>" +
           "<span>" + ICONS.clock + esc(game.time || "aika avoin") + "</span>" +
           (game.venue ? "<span>" + ICONS.pin + esc(game.venue) + "</span>" : "") +
+          (isOpen(game) && game.opponent_label
+            ? "<span>" + esc(game.opponent_label) + "</span>"
+            : "") +
         "</div>" +
         (pick.at ? '<div class="when">' + esc(relativeWhen(pick.at)) + "</div>" : "") +
       "</div>";
+  }
+
+  // Jatko-ottelu voi olla vahvistettu Ilvekselle vaikka vastustaja on vielä
+  // auki. Vanhassa datassa kenttää ei ole, jolloin vastustaja on vahvistettu.
+  function isOpen(game) {
+    return game.opponent_confirmed === false;
+  }
+
+  function teamsText(game) {
+    if (isOpen(game)) {
+      return 'Ilves vs <span class="open-opponent">vastustaja ratkeaa</span>';
+    }
+    return "Ilves vs " + esc(game.opponent);
   }
 
   // games.json sisaltaa tuloksen sivuston muodossa koti-vieras. Kortin otsikko
@@ -404,10 +458,13 @@
     return '<article class="game">' +
         '<div class="' + badgeClass + '">' + esc(game.series) + "</div>" +
         '<div class="game-main">' +
-          '<div class="game-teams">Ilves vs ' + esc(game.opponent) + "</div>" +
+          '<div class="game-teams">' + teamsText(game) + "</div>" +
           '<div class="game-meta">' +
             "<span>" + ICONS.clock + esc(game.time || "–") + "</span>" +
             (game.venue ? '<span class="venue">' + ICONS.pin + esc(game.venue) + "</span>" : "") +
+            (isOpen(game) && game.opponent_label
+              ? '<span class="tbd">' + ICONS.tag + esc(game.opponent_label) + "</span>"
+              : "") +
           "</div>" +
         "</div>" +
         '<div class="game-result">' + right + "</div>" +
@@ -432,6 +489,60 @@
     elList.innerHTML = html;
   }
 
+  // R4: sarjat joilla on jatko-ottelut tulossa mutta ottelupari ei vielä tiedossa.
+  // Suodatin rajaa listan samalla tavalla kuin pelilistan.
+  function pendingPlayoffs() {
+    var series = (state.data && state.data.series) || {};
+    var order = (state.data && state.data.series_order) || [];
+    var out = [];
+    order.forEach(function (key) {
+      if (state.filter !== "Kaikki" && state.filter !== key) return;
+      var info = series[key] && series[key].playoffs;
+      if (!info || !info.pending) return;
+      out.push({
+        series: key,
+        dates: info.upcoming_dates || info.dates || [],
+        range: info.time_range || null
+      });
+    });
+    return out;
+  }
+
+  function renderPlayoffs() {
+    var pending = pendingPlayoffs();
+    if (!pending.length) { elPlayoffs.innerHTML = ""; return; }
+
+    // ryhmitellaan paivan mukaan, jottei viisi sarjaa tuota viitta korttia.
+    // Kelloväli yhdistetään ryhmän sarjojen yli, ettei se näytä vain yhden
+    // sarjan aikoja muidenkin nimissä.
+    var byDate = {};
+    pending.forEach(function (item) {
+      var key = item.dates[0] || "";
+      if (!byDate[key]) byDate[key] = { series: [], from: null, to: null };
+      var group = byDate[key];
+      group.series.push(item.series);
+      if (item.range) {
+        if (!group.from || item.range[0] < group.from) group.from = item.range[0];
+        if (!group.to || item.range[1] > group.to) group.to = item.range[1];
+      }
+    });
+
+    var rows = Object.keys(byDate).sort().map(function (date) {
+      var group = byDate[date];
+      var when = date ? dayHeading(date) : "Ajankohta avoin";
+      var clock = group.from
+        ? ' <span class="clock">klo ' + esc(group.from) + "–" + esc(group.to) + "</span>"
+        : "";
+      return '<div class="row">' + esc(when) + " · " + esc(group.series.join(", ")) + clock + "</div>";
+    }).join("");
+
+    elPlayoffs.innerHTML =
+      '<div class="playoffs">' +
+        '<div class="label">Jatko-ottelut</div>' + rows +
+        '<div class="hint">Otteluparit ratkeavat lohkovaiheen jälkeen. Ottelu ilmestyy tälle sivulle heti kun Ilveksen paikka on vahvistettu.</div>' +
+      "</div>";
+  }
+
   function renderNotes() {
     var series = (state.data && state.data.series) || {};
     var stale = Object.keys(series).filter(function (key) { return series[key] && series[key].ok === false; });
@@ -446,6 +557,7 @@
     elUpdated.textContent = updatedText(state.data.updated_at);
     renderNotes();
     renderNext(games);
+    renderPlayoffs();
     renderList(games);
   }
 

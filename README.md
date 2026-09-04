@@ -51,6 +51,41 @@ python3 -m venv .venv
 - Päivämäärästä puuttuu vuosi, joten se päätellään valitsemalla ajallisesti
   lähin vaihtoehto kuluvasta, edellisestä ja seuraavasta vuodesta.
 
+## Jatko-ottelut
+
+Osa sarjoista jatkaa lohkovaiheen jälkeen jatko-otteluihin (U9, U10, U11, TU11,
+TU12 sunnuntaina 6.9., U12 ja TU13 lauantaina 5.9.). Joukkuesivulla nämä ovat
+ehdollisina skenaariolistoina ("Jatko-ottelut, jos alkulohkon ensimmäinen"),
+joissa joukkueet ovat paikanvaraajia: `A/I`, `B/IV`, `Voittaja 531`,
+`Häviäjä 537`, `Paras seitsemäs`.
+
+Säännöt:
+
+1. **Ottelu näytetään vasta kun Ilves on vahvistettu osallistuja.**
+   Paikanvaraajat eivät koskaan päädy sivulle, joten spekulatiivisia otteluita
+   ei listata. Myöhemmät kierrokset ilmestyvät porrastetusti sitä mukaa kun ne
+   ratkeavat.
+2. **Paikanvaraaja tunnistetaan kuviolla** (`is_placeholder`). Tuntematon muoto
+   tulkitaan oikeaksi joukkueeksi — väärä tulkinta siihen suuntaan on
+   korjattavissa, oikean ottelun hiljainen piilottaminen ei näkyisi.
+3. **Vastustaja voi olla vielä auki.** Silloin ottelu näytetään muodossa
+   "Ilves vs vastustaja ratkeaa", ja paikanvaraaja käännetään luettavaksi
+   (`B/IV` → "Lohko B, 4.", `Voittaja 531` → "Ottelun 531 voittaja").
+   Aika ja kenttä ovat varmoja tietoja, joten ne näytetään normaalisti.
+4. **Sarjakohtainen "jatko-ottelut tulossa" -kortti** kertoo päivän ja
+   kellovälin skenaariolistojen tiedoista, ilman otteluparia. Kortti katoaa
+   automaattisesti kun sarjan jatko-ottelu vahvistuu.
+5. **"Seuraavaksi pelaa"** näyttää "Jatko-ottelu ratkeaa", kun lohkovaihe on
+   pelattu mutta paria ei ole vielä vahvistettu — ei "Kaikki pelit pelattu".
+6. **Varalähde:** jos vahvistettu jatko-ottelu ei näy joukkueen omassa
+   otteluohjelmassa, haetaan sarjan jatkolohkojen sivut
+   (`sarja.php?...&lohko=3|4|5|6`). Nämä haetaan **vain** kun sarjalla on
+   jatko-ottelut tulossa, kaikki lohko-ottelut on pelattu, eikä jatko-ottelua
+   ole vielä löytynyt — eli käytännössä vain ratkeamisikkunassa.
+7. **Ottelun identiteetti on ottelu-id** (`ottelu.php?ottelu=NNNN`), joka on
+   pysyvä paikanvaraajan ratkeamisen yli. Sama ottelu useasta lähteestä
+   yhdistyy yhdeksi riviksi.
+
 ## Päivitystahti
 
 Haku pyörii 5 minuutin välein. GitHubin cron **ei** yksin riitä tähän: se on

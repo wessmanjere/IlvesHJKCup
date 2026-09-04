@@ -155,18 +155,84 @@ def split_time_and_result(raw: str) -> tuple[str, str]:
     return "", ""
 
 
-def parse_games(html: str, series: str, today: dt.date) -> list[dict[str, Any]]:
-    """Poimii sivulta oman joukkueen ottelut.
+# Ehdollisten jatko-otteluiden paikanvaraajat. Naita EI koskaan naytela
+# otteluna: ottelu paasee listalle vain jos Ilves on vahvistettu osallistuja.
+PLACEHOLDER_RES = (
+    re.compile(r"^[A-Z]/[IVXLC]+$"),                    # A/I, B/IV, A/VIII
+    re.compile(r"^(?:Voittaja|Haviaja|Häviäjä)\s+\d+$", re.I),  # Voittaja 531
+    re.compile(r"^\d*\.?\s*paras\s+\w+$", re.I),      # Paras seitsemas
+)
+ROMAN_VALUES = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100}
 
-    Sivulla on useita matchlist-listoja: oma otteluohjelma seka ehdolliset
-    jatko-ottelut ("jos alkulohkon ensimmainen"), joissa joukkueet ovat vain
-    paikanvaraajia. Otetaan mukaan vain ottelut joissa Ilves on mukana.
+
+def is_placeholder(name: str) -> bool:
+    """Onko nimi paikanvaraaja oikean joukkueen sijaan.
+
+    Tuntematon muoto tulkitaan oikeaksi joukkueeksi: vaara tulkinta siihen
+    suuntaan on korjattavissa, kun taas oikean ottelun hiljainen piilottaminen
+    ei nayisi mitenkaan.
     """
-    soup = BeautifulSoup(html, "html.parser")
+    value = name.strip()
+    return bool(value) and any(pattern.match(value) for pattern in PLACEHOLDER_RES)
+
+
+def roman_to_int(roman: str) -> int | None:
+    total = 0
+    previous = 0
+    for char in reversed(roman.upper()):
+        value = ROMAN_VALUES.get(char)
+        if value is None:
+            return None
+        total += value if value >= previous else -value
+        previous = max(previous, value)
+    return total or None
+
+
+def placeholder_label(name: str) -> str:
+    """Paikanvaraaja luettavaan muotoon, esim. 'B/IV' -> 'Lohko B, 4.'."""
+    value = name.strip()
+
+    group = re.match(r"^([A-Z])/([IVXLC]+)$", value)
+    if group:
+        place = roman_to_int(group.group(2))
+        if place:
+            return f"Lohko {group.group(1)}, {place}."
+        return f"Lohko {group.group(1)}"
+
+    bracket = re.match(r"^(Voittaja|Haviaja|Häviäjä)\s+(\d+)$", value, re.I)
+    if bracket:
+        word = "voittaja" if bracket.group(1).lower().startswith("voit") else "häviäjä"
+        return f"Ottelun {bracket.group(2)} {word}"
+
+    return value
+
+
+def match_identity(item: Any, series: str, number: str, home: str, away: str) -> tuple[str, str]:
+    """Ottelun pysyva tunniste. Ottelu-id sailyy paikanvaraajan ratkeamisen yli."""
+    link = item.find_parent("a")
+    href = link.get("href", "") if link else ""
+    match_id = ""
+    if href:
+        found = re.search(r"ottelu=(\d+)", href)
+        if found:
+            match_id = found.group(1)
+    key = match_id or f"{series}-{number}-{home}-{away}"
+    return key, match_id
+
+
+def extract_games(
+    scope: Any,
+    series: str,
+    today: dt.date,
+    playoff_ids: set[str] | None = None,
+    force_stage: str | None = None,
+) -> list[dict[str, Any]]:
+    """Poimii annetusta osasta ne ottelut joissa Ilves on vahvistettu mukana."""
+    playoff_ids = playoff_ids or set()
     games: list[dict[str, Any]] = []
     seen: set[str] = set()
 
-    for item in soup.select("ul.matchlist li.match"):
+    for item in scope.select("ul.matchlist li.match"):
         def cell(*names: str) -> str:
             # taso-asennukset kayttavat eri luokkanimia (esim. ml_pvm /
             # ml_pvmsiisti), joten kokeillaan vaihtoehdot jarjestyksessa
@@ -180,50 +246,157 @@ def parse_games(html: str, series: str, today: dt.date) -> list[dict[str, Any]]:
         away = cell("ml_vierassiisti", "ml_vieras")
         if not home or not away:
             continue
-        is_home = CLUB_MATCH in home.lower()
-        is_away = CLUB_MATCH in away.lower()
+
+        # R1: Ilveksen oma nimi ratkaisee. Paikanvaraaja ei koskaan sisalla
+        # "Ilves", joten spekulatiiviset rivit karsiutuvat tassa.
+        is_home = CLUB_MATCH in home.lower() and not is_placeholder(home)
+        is_away = CLUB_MATCH in away.lower() and not is_placeholder(away)
         if not (is_home or is_away):
             continue
 
         number = cell("ml_ottelunro")
-        link = item.find_parent("a")
-        href = link.get("href", "") if link else ""
-        match_id = ""
-        if href:
-            id_match = re.search(r"ottelu=(\d+)", href)
-            if id_match:
-                match_id = id_match.group(1)
-        key = match_id or f"{series}-{number}-{home}-{away}"
+        key, match_id = match_identity(item, series, number, home, away)
         if key in seen:
             continue
         seen.add(key)
+
+        opponent = away if is_home else home
+        opponent_open = is_placeholder(opponent)
 
         raw_date = cell("ml_pvm", "ml_pvmsiisti")
         kickoff, result = split_time_and_result(cell("ml_tulosklo"))
         # uudemmat taso-versiot merkitsevat pelatun ottelun li-luokkaan
         played = bool(result) or "played" in (item.get("class") or [])
+        stage = force_stage or ("jatko" if match_id and match_id in playoff_ids else "lohko")
+
         games.append(
             {
                 "id": key,
                 "match_id": match_id,
                 "match_number": number,
                 "series": series,
+                "stage": stage,
                 "date": raw_date,
                 "date_iso": parse_date(raw_date, today),
                 "time": kickoff,
                 "venue": cell("ml_kenttanimi", "ml_kentta"),
                 "home": home,
                 "away": away,
-                "opponent": away if is_home else home,
+                "opponent": opponent,
+                "opponent_confirmed": not opponent_open,
+                "opponent_placeholder": opponent if opponent_open else "",
+                "opponent_label": placeholder_label(opponent) if opponent_open else "",
                 "is_home": is_home,
                 "result": result,
                 "played": played,
-                "url": requests.compat.urljoin("https://hjkcup.fi/taso/", href) if href else "",
+                "url": requests.compat.urljoin("https://hjkcup.fi/taso/", href_of(item)),
             }
         )
 
+    return sort_games(games)
+
+
+def href_of(item: Any) -> str:
+    link = item.find_parent("a")
+    return link.get("href", "") if link else ""
+
+
+def sort_games(games: list[dict[str, Any]]) -> list[dict[str, Any]]:
     games.sort(key=lambda g: (g["date_iso"] or "9999-99-99", g["time"] or "99:99", g["match_number"]))
     return games
+
+
+def parse_team_page(html: str, series: str, today: dt.date) -> dict[str, Any]:
+    """Lukee joukkuesivun: oma otteluohjelma + ehdollisten jatko-otteluiden tiedot.
+
+    Ensimmainen matchlist on joukkueen oma vahvistettu otteluohjelma. Loput ovat
+    skenaariolistoja ("Jatko-ottelut, jos alkulohkon ensimmainen"), joista
+    luetaan vain jatko-otteluiden ottelu-id:t, paivat ja kelloajat.
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    lists = soup.select("ul.matchlist")
+
+    playoff_ids: set[str] = set()
+    playoff_dates: set[str] = set()
+    playoff_times: list[str] = []
+
+    for scenario in lists[1:]:
+        for item in scenario.select("li.match"):
+            found = re.search(r"ottelu=(\d+)", href_of(item))
+            if found:
+                playoff_ids.add(found.group(1))
+            date_node = item.select_one("div.ml_pvm") or item.select_one("div.ml_pvmsiisti")
+            if date_node is not None:
+                iso = parse_date(clean_text(date_node), today)
+                if iso:
+                    playoff_dates.add(iso)
+            time_node = item.select_one("div.ml_tulosklo")
+            if time_node is not None:
+                kickoff, _ = split_time_and_result(clean_text(time_node))
+                if kickoff:
+                    playoff_times.append(kickoff)
+
+    # R6: jatkolohkojen omat sivut varalahteeksi, jos vahvistettu jatko-ottelu
+    # ei nayttaydy joukkueen omassa otteluohjelmassa
+    block_urls: list[str] = []
+    for link in soup.select("a[href*='lohko=']"):
+        if "jatko" not in clean_text(link).lower():
+            continue
+        url = requests.compat.urljoin("https://hjkcup.fi/taso/", link.get("href", ""))
+        if url not in block_urls:
+            block_urls.append(url)
+
+    return {
+        "games": extract_games(soup, series, today, playoff_ids),
+        "playoff_dates": sorted(playoff_dates),
+        "playoff_time_range": [min(playoff_times), max(playoff_times)] if playoff_times else None,
+        "block_urls": block_urls,
+    }
+
+
+def parse_block_page(html: str, series: str, today: dt.date) -> list[dict[str, Any]]:
+    """Jatkolohkon oma sivu: kaikki sen ottelut ovat jatko-otteluita."""
+    soup = BeautifulSoup(html, "html.parser")
+    return extract_games(soup, series, today, force_stage="jatko")
+
+
+def needs_block_lookup(games: list[dict[str, Any]], page: dict[str, Any]) -> bool:
+    """R6: lohko-sivut haetaan vain otteluparien ratkeamisikkunassa."""
+    if not page["playoff_dates"] or not page["block_urls"]:
+        return False
+    if any(game["stage"] == "jatko" for game in games):
+        return False  # jatko-ottelu on jo vahvistunut joukkuesivulle
+    group = [game for game in games if game["stage"] == "lohko"]
+    if not group or any(not game["played"] for game in group):
+        return False  # lohkovaihe kesken, ei ole mita ratketa
+    return True
+
+
+def merge_games(
+    games: list[dict[str, Any]], extra: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Yhdistaa ottelut pysyvalla tunnisteella, jottei sama ottelu tule kahdesti."""
+    known = {game["id"] for game in games}
+    for game in extra:
+        if game["id"] not in known:
+            known.add(game["id"])
+            games.append(game)
+    return sort_games(games)
+
+
+def playoff_state(
+    games: list[dict[str, Any]], page: dict[str, Any], today: dt.date
+) -> dict[str, Any]:
+    """R4: sarjakohtainen tieto tulevista jatko-otteluista, ilman spekulaatiota."""
+    dates = page["playoff_dates"]
+    upcoming = [date for date in dates if date >= today.isoformat()]
+    confirmed = any(game["stage"] == "jatko" for game in games)
+    return {
+        "pending": bool(upcoming) and not confirmed,
+        "dates": dates,
+        "upcoming_dates": upcoming,
+        "time_range": page["playoff_time_range"],
+    }
 
 
 def load_previous(path: Path) -> dict[str, Any]:
@@ -273,11 +446,27 @@ def main() -> int:
         old = previous_series.get(series, {})
         old_games = old.get("games", []) if isinstance(old, dict) else []
         try:
-            html = fetch_html(session, url)
-            games = parse_games(html, series, today)
+            page = parse_team_page(fetch_html(session, url), series, today)
+            games = page["games"]
             if not games:
+                # R8: onnistunut mutta tyhja haku on virhe, ei tyhjennys
                 raise ValueError("otteluita ei loytynyt sivulta")
+
+            # R6: jatkolohkojen sivut haetaan vain ratkeamisikkunassa
+            if needs_block_lookup(games, page):
+                for block_url in page["block_urls"]:
+                    time.sleep(args.delay)
+                    try:
+                        extra = parse_block_page(fetch_html(session, block_url), series, today)
+                    except Exception as error:
+                        print(f"[HUOM] {series}: jatkolohkon haku epaonnistui ({error})", file=sys.stderr)
+                        continue
+                    if extra:
+                        print(f"[OK] {series}: jatkolohkosta {len(extra)} ottelua ({block_url})")
+                        games = merge_games(games, extra)
+
             carry_over_times(games, old_games)
+            playoffs = playoff_state(games, page, today)
         except Exception as error:  # yksi sarja ei kaada koko ajoa
             failures.append(series)
             print(f"[VIRHE] {series}: {error}", file=sys.stderr)
@@ -289,10 +478,17 @@ def main() -> int:
                 "fetched_at": old.get("fetched_at") if isinstance(old, dict) else None,
                 "stale": True,
                 "games": old_games,
+                "playoffs": old.get("playoffs") if isinstance(old, dict) else None,
             }
             continue
 
-        print(f"[OK] {series}: {len(games)} ottelua")
+        jatko = sum(1 for game in games if game["stage"] == "jatko")
+        avoin = sum(1 for game in games if not game["opponent_confirmed"])
+        print(
+            f"[OK] {series}: {len(games)} ottelua "
+            f"(jatko-otteluita {jatko}, vastustaja avoin {avoin}, "
+            f"jatko tulossa: {'kylla' if playoffs['pending'] else 'ei'})"
+        )
         series_data[series] = {
             "team_id": team_id,
             "url": url,
@@ -301,6 +497,7 @@ def main() -> int:
             "fetched_at": now.isoformat(timespec="seconds"),
             "stale": False,
             "games": games,
+            "playoffs": playoffs,
         }
 
     all_games = [game for series, _ in TEAMS for game in series_data[series]["games"]]
