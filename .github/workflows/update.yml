@@ -2,9 +2,10 @@ name: Päivitä pelitiedot
 
 on:
   schedule:
-    # GitHubin cron on "best effort" eika laukea luotettavasti tiheilla
-    # valeilla, joten cron vain kaynnistaa ajon ja ajo itse kiertaa 5 minuutin
-    # valein. Nain paivitys jatkuu vaikka cron laukeaisi vain kerran tunnissa.
+    # GitHubin cron on "best effort": mitattu todellinen vali tassa repossa
+    # on 1 h 42 min - 4 h 40 min, ei 5 minuuttia. Cron vain kaynnistaa ajon ja
+    # ajo itse kiertaa 5 minuutin valein lahes kuusi tuntia, jotta cronin
+    # pisinkin havaittu vali tulee katettua eika hakuun jaa katkoja.
     - cron: "*/5 * * * *"
   workflow_dispatch:
     inputs:
@@ -15,7 +16,7 @@ on:
       duration_minutes:
         description: "Kuinka kauan yksi ajo kiertaa (minuuttia, enintaan 350)"
         required: false
-        default: "50"
+        default: "350"
   push:
     paths:
       - "scraper/**"
@@ -35,7 +36,7 @@ jobs:
     timeout-minutes: 355
     env:
       INTERVAL_SECONDS: ${{ github.event.inputs.interval_seconds || '300' }}
-      DURATION_MINUTES: ${{ github.event.inputs.duration_minutes || '50' }}
+      DURATION_MINUTES: ${{ github.event.inputs.duration_minutes || '350' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -93,7 +94,14 @@ jobs:
           }
 
           interval="$INTERVAL_SECONDS"
-          deadline=$(( $(date +%s) + DURATION_MINUTES * 60 ))
+
+          # jobin timeout on 355 min, joten kesto rajataan sen alle
+          duration="$DURATION_MINUTES"
+          if [ "$duration" -gt 350 ]; then
+            echo "Kesto $duration min rajattu 350 minuuttiin (jobin timeout)."
+            duration=350
+          fi
+          deadline=$(( $(date +%s) + duration * 60 ))
           rounds=0
           pushes=0
 

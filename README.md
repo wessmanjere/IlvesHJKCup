@@ -54,23 +54,27 @@ python3 -m venv .venv
 ## Päivitystahti
 
 Haku pyörii 5 minuutin välein. GitHubin cron **ei** yksin riitä tähän: se on
-"best effort" eikä laukea luotettavasti tiheillä väleillä — tässä repossa se ei
-lauennut kertaakaan ensimmäisen 95 minuutin aikana. Siksi workflow ei luota
-croniin:
+"best effort". Tässä repossa mitatut todelliset välit cron-ajojen välillä ovat
+olleet **1 h 42 min – 4 h 40 min**, eivät 5 minuuttia. Siksi workflow ei luota
+croniin ajan mittaamiseen:
 
 - cron `*/5 * * * *` **käynnistää** ajon aina kun GitHub sen laukaisee,
-- yksi ajo **kiertää itse 5 minuutin välein** enintään 50 minuuttia,
+- yksi ajo **kiertää itse 5 minuutin välein 350 minuuttia** (≈ 5 h 50 min),
 - `concurrency: cancel-in-progress: true` varmistaa, että uusi käynnistys
   korvaa edellisen silmukan eikä jonoon kerry ajoja.
 
-Näin päivitys jatkuu 5 minuutin tahdissa vaikka cron laukeaisi vain kerran
-tunnissa — tai vaikka ei lainkaan, kun ajo käynnistetään käsin.
+Kesto on mitoitettu pidemmäksi kuin cronin pisin havaittu väli, joten hakuun ei
+jää katkoja. Aiempi 50 minuutin kesto kattoi vain noin 28 % ajasta, ja
+turnauspäivänä yhden pelin tulos jäi kokonaan hakematta cron-katkoon.
 
-### Turnauspäivä
-
-Käynnistä ajo käsin *Run workflow* -napista ja anna `duration_minutes`-kentälle
-esim. `350`. Yksi käynnistys kattaa silloin lähes kuusi tuntia yhtäjaksoista
-5 minuutin päivitystä (Actionsin jobin enimmäiskesto on 6 h).
+Actionsin jobin enimmäiskesto on 6 h, joten 350 on käytännön maksimi; skripti
+rajaa suuremmat arvot siihen automaattisesti.
 
 Commit syntyy joka kierroksella, koska `games.json` sisältää hakuaikaleiman.
 Sivun "Päivitetty"-rivi kertoo siis todella milloin tiedot on haettu.
+
+### Turnauksen jälkeen
+
+Ajo pyörii käytännössä yhtäjaksoisesti ja tekee commitin viiden minuutin
+välein. Kun turnaus on ohi, workflow kannattaa laittaa pois päältä
+(Actions → Päivitä pelitiedot → `···` → Disable workflow).
