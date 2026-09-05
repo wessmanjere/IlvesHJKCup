@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-05T20:19:33+03:00",
+ "updated_at": "2026-09-05T20:25:03+03:00",
  "tournament": "hjk_0031",
  "club": "Ilves",
  "series_order": [
@@ -17,7 +17,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224617&turnaus=hjk_0031&sarja=U9",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-05T20:19:33+03:00",
+   "fetched_at": "2026-09-05T20:25:03+03:00",
    "stale": false,
    "games": [
     {
@@ -292,7 +292,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224897&turnaus=hjk_0031&sarja=U10",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-05T20:19:33+03:00",
+   "fetched_at": "2026-09-05T20:25:03+03:00",
    "stale": false,
    "games": [
     {
@@ -567,7 +567,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35222219&turnaus=hjk_0031&sarja=U11",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-05T20:19:33+03:00",
+   "fetched_at": "2026-09-05T20:25:03+03:00",
    "stale": false,
    "games": [
     {
@@ -737,10 +737,31 @@
      "result": "1 - 3",
      "played": true,
      "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317491"
+    },
+    {
+     "id": "4317496",
+     "match_id": "4317496",
+     "match_number": "640",
+     "series": "U11",
+     "stage": "jatko",
+     "date": "6.9.",
+     "date_iso": "2026-09-06",
+     "time": "10:20",
+     "venue": "Sahara TN A",
+     "home": "Ilves",
+     "away": "A/IV",
+     "opponent": "A/IV",
+     "opponent_confirmed": false,
+     "opponent_placeholder": "A/IV",
+     "opponent_label": "Lohko A, 4.",
+     "is_home": true,
+     "result": "",
+     "played": false,
+     "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317496"
     }
    ],
    "playoffs": {
-    "pending": true,
+    "pending": false,
     "dates": [
      "2026-09-06"
     ],
@@ -748,8 +769,8 @@
      "2026-09-06"
     ],
     "time_range": [
-     "09:00",
-     "14:40"
+     "10:20",
+     "14:10"
     ]
    }
   },
@@ -758,7 +779,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224865&turnaus=hjk_0031&sarja=U12",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-05T20:19:33+03:00",
+   "fetched_at": "2026-09-05T20:25:03+03:00",
    "stale": false,
    "games": [
     {
@@ -946,7 +967,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35222065&turnaus=hjk_0031&sarja=TU11",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-05T20:19:33+03:00",
+   "fetched_at": "2026-09-05T20:25:03+03:00",
    "stale": false,
    "games": [
     {
@@ -1074,7 +1095,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224889&turnaus=hjk_0031&sarja=TU12",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-05T20:19:33+03:00",
+   "fetched_at": "2026-09-05T20:25:03+03:00",
    "stale": false,
    "games": [
     {
@@ -1265,7 +1286,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224802&turnaus=hjk_0031&sarja=TU13",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-05T20:19:33+03:00",
+   "fetched_at": "2026-09-05T20:25:03+03:00",
    "stale": false,
    "games": [
     {
@@ -2415,6 +2436,27 @@
    "result": "",
    "played": false,
    "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317403"
+  },
+  {
+   "id": "4317496",
+   "match_id": "4317496",
+   "match_number": "640",
+   "series": "U11",
+   "stage": "jatko",
+   "date": "6.9.",
+   "date_iso": "2026-09-06",
+   "time": "10:20",
+   "venue": "Sahara TN A",
+   "home": "Ilves",
+   "away": "A/IV",
+   "opponent": "A/IV",
+   "opponent_confirmed": false,
+   "opponent_placeholder": "A/IV",
+   "opponent_label": "Lohko A, 4.",
+   "is_home": true,
+   "result": "",
+   "played": false,
+   "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317496"
   },
   {
    "id": "4317610",
