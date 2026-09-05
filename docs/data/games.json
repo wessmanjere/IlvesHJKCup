@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-05T12:26:23+03:00",
+ "updated_at": "2026-09-05T12:31:45+03:00",
  "tournament": "hjk_0031",
  "club": "Ilves",
  "series_order": [
@@ -17,7 +17,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224617&turnaus=hjk_0031&sarja=U9",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-05T12:26:23+03:00",
+   "fetched_at": "2026-09-05T12:31:45+03:00",
    "stale": false,
    "games": [
     {
@@ -208,30 +208,9 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224897&turnaus=hjk_0031&sarja=U10",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-05T12:26:23+03:00",
+   "fetched_at": "2026-09-05T12:31:45+03:00",
    "stale": false,
    "games": [
-    {
-     "id": "4317532",
-     "match_id": "4317532",
-     "match_number": "679",
-     "series": "U10",
-     "stage": "lohko",
-     "date": "5.9.",
-     "date_iso": "2026-09-05",
-     "time": "12:05",
-     "venue": "Bolt Arena TN A",
-     "home": "Turun Nappulaliiga (TuNL)",
-     "away": "Ilves",
-     "opponent": "Turun Nappulaliiga (TuNL)",
-     "opponent_confirmed": true,
-     "opponent_placeholder": "",
-     "opponent_label": "",
-     "is_home": false,
-     "result": "",
-     "played": false,
-     "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317532"
-    },
     {
      "id": "4317536",
      "match_id": "4317536",
@@ -378,6 +357,27 @@
      "result": "1 - 0",
      "played": true,
      "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317527"
+    },
+    {
+     "id": "4317532",
+     "match_id": "4317532",
+     "match_number": "679",
+     "series": "U10",
+     "stage": "lohko",
+     "date": "5.9.",
+     "date_iso": "2026-09-05",
+     "time": "12:05",
+     "venue": "Bolt Arena TN A",
+     "home": "Turun Nappulaliiga (TuNL)",
+     "away": "Ilves",
+     "opponent": "Turun Nappulaliiga (TuNL)",
+     "opponent_confirmed": true,
+     "opponent_placeholder": "",
+     "opponent_label": "",
+     "is_home": false,
+     "result": "2 - 1",
+     "played": true,
+     "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317532"
     }
    ],
    "playoffs": {
@@ -399,7 +399,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35222219&turnaus=hjk_0031&sarja=U11",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-05T12:26:23+03:00",
+   "fetched_at": "2026-09-05T12:31:45+03:00",
    "stale": false,
    "games": [
     {
@@ -590,7 +590,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224865&turnaus=hjk_0031&sarja=U12",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-05T12:26:23+03:00",
+   "fetched_at": "2026-09-05T12:31:45+03:00",
    "stale": false,
    "games": [
     {
@@ -760,7 +760,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35222065&turnaus=hjk_0031&sarja=TU11",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-05T12:26:23+03:00",
+   "fetched_at": "2026-09-05T12:31:45+03:00",
    "stale": false,
    "games": [
     {
@@ -867,30 +867,9 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224889&turnaus=hjk_0031&sarja=TU12",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-05T12:26:23+03:00",
+   "fetched_at": "2026-09-05T12:31:45+03:00",
    "stale": false,
    "games": [
-    {
-     "id": "4317708",
-     "match_id": "4317708",
-     "match_number": "814",
-     "series": "TU12",
-     "stage": "lohko",
-     "date": "5.9.",
-     "date_iso": "2026-09-05",
-     "time": "12:00",
-     "venue": "Sahara TN A",
-     "home": "Ilves/T2014",
-     "away": "SK Brann",
-     "opponent": "SK Brann",
-     "opponent_confirmed": true,
-     "opponent_placeholder": "",
-     "opponent_label": "",
-     "is_home": true,
-     "result": "",
-     "played": false,
-     "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317708"
-    },
     {
      "id": "4317716",
      "match_id": "4317716",
@@ -920,8 +899,8 @@
      "stage": "lohko",
      "date": "5.9.",
      "date_iso": "2026-09-05",
-     "time": "15:30",
-     "venue": "Sahara TN A",
+     "time": "15:05",
+     "venue": "Sahara TN B",
      "home": "Man City",
      "away": "Ilves/T2014",
      "opponent": "Man City",
@@ -932,6 +911,27 @@
      "result": "",
      "played": false,
      "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317712"
+    },
+    {
+     "id": "4317708",
+     "match_id": "4317708",
+     "match_number": "814",
+     "series": "TU12",
+     "stage": "lohko",
+     "date": "5.9.",
+     "date_iso": "2026-09-05",
+     "time": "12:00",
+     "venue": "Sahara TN A",
+     "home": "Ilves/T2014",
+     "away": "SK Brann",
+     "opponent": "SK Brann",
+     "opponent_confirmed": true,
+     "opponent_placeholder": "",
+     "opponent_label": "",
+     "is_home": true,
+     "result": "1 - 3",
+     "played": true,
+     "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317708"
     },
     {
      "id": "4317713",
@@ -974,7 +974,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224802&turnaus=hjk_0031&sarja=TU13",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-05T12:26:23+03:00",
+   "fetched_at": "2026-09-05T12:31:45+03:00",
    "stale": false,
    "games": [
     {
@@ -1515,8 +1515,8 @@
    "opponent_placeholder": "",
    "opponent_label": "",
    "is_home": true,
-   "result": "",
-   "played": false,
+   "result": "1 - 3",
+   "played": true,
    "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317708"
   },
   {
@@ -1536,8 +1536,8 @@
    "opponent_placeholder": "",
    "opponent_label": "",
    "is_home": false,
-   "result": "",
-   "played": false,
+   "result": "2 - 1",
+   "played": true,
    "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317532"
   },
   {
@@ -1716,8 +1716,8 @@
    "stage": "lohko",
    "date": "5.9.",
    "date_iso": "2026-09-05",
-   "time": "15:30",
-   "venue": "Sahara TN A",
+   "time": "15:05",
+   "venue": "Sahara TN B",
    "home": "Man City",
    "away": "Ilves/T2014",
    "opponent": "Man City",
