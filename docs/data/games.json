@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-06T14:27:37+03:00",
+ "updated_at": "2026-09-06T14:32:59+03:00",
  "tournament": "hjk_0031",
  "club": "Ilves",
  "series_order": [
@@ -17,7 +17,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224617&turnaus=hjk_0031&sarja=U9",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T14:27:37+03:00",
+   "fetched_at": "2026-09-06T14:32:59+03:00",
    "stale": false,
    "games": [
     {
@@ -289,7 +289,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224897&turnaus=hjk_0031&sarja=U10",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T14:27:37+03:00",
+   "fetched_at": "2026-09-06T14:32:59+03:00",
    "stale": false,
    "games": [
     {
@@ -561,7 +561,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35222219&turnaus=hjk_0031&sarja=U11",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T14:27:37+03:00",
+   "fetched_at": "2026-09-06T14:32:59+03:00",
    "stale": false,
    "games": [
     {
@@ -812,7 +812,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224865&turnaus=hjk_0031&sarja=U12",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T14:27:37+03:00",
+   "fetched_at": "2026-09-06T14:32:59+03:00",
    "stale": false,
    "games": [
     {
@@ -998,7 +998,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35222065&turnaus=hjk_0031&sarja=TU11",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T14:27:37+03:00",
+   "fetched_at": "2026-09-06T14:32:59+03:00",
    "stale": false,
    "games": [
     {
@@ -1147,7 +1147,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224889&turnaus=hjk_0031&sarja=TU12",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T14:27:37+03:00",
+   "fetched_at": "2026-09-06T14:32:59+03:00",
    "stale": false,
    "games": [
     {
@@ -1335,7 +1335,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224802&turnaus=hjk_0031&sarja=TU13",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T14:27:37+03:00",
+   "fetched_at": "2026-09-06T14:32:59+03:00",
    "stale": false,
    "games": [
     {
