@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-06T12:50:44+03:00",
+ "updated_at": "2026-09-06T12:56:06+03:00",
  "tournament": "hjk_0031",
  "club": "Ilves",
  "series_order": [
@@ -17,7 +17,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224617&turnaus=hjk_0031&sarja=U9",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T12:50:44+03:00",
+   "fetched_at": "2026-09-06T12:56:06+03:00",
    "stale": false,
    "games": [
     {
@@ -189,27 +189,6 @@
      "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317351"
     },
     {
-     "id": "4317407",
-     "match_id": "4317407",
-     "match_number": "548",
-     "series": "U9",
-     "stage": "jatko",
-     "date": "6.9.",
-     "date_iso": "2026-09-06",
-     "time": "12:30",
-     "venue": "Töölö PK 4 TN (Kupla) B",
-     "home": "JK Tallinna Kalev",
-     "away": "Ilves",
-     "opponent": "JK Tallinna Kalev",
-     "opponent_confirmed": true,
-     "opponent_placeholder": "",
-     "opponent_label": "",
-     "is_home": false,
-     "result": "",
-     "played": false,
-     "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317407"
-    },
-    {
      "id": "4317403",
      "match_id": "4317403",
      "match_number": "544",
@@ -229,6 +208,27 @@
      "result": "3 - 1",
      "played": true,
      "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317403"
+    },
+    {
+     "id": "4317407",
+     "match_id": "4317407",
+     "match_number": "548",
+     "series": "U9",
+     "stage": "jatko",
+     "date": "6.9.",
+     "date_iso": "2026-09-06",
+     "time": "12:30",
+     "venue": "Töölö PK 4 TN (Kupla) B",
+     "home": "JK Tallinna Kalev",
+     "away": "Ilves",
+     "opponent": "JK Tallinna Kalev",
+     "opponent_confirmed": true,
+     "opponent_placeholder": "",
+     "opponent_label": "",
+     "is_home": false,
+     "result": "2 - 2",
+     "played": true,
+     "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317407"
     },
     {
      "id": "4317408",
@@ -281,10 +281,7 @@
     "upcoming_dates": [
      "2026-09-06"
     ],
-    "time_range": [
-     "12:30",
-     "12:30"
-    ]
+    "time_range": null
    }
   },
   "U10": {
@@ -292,7 +289,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224897&turnaus=hjk_0031&sarja=U10",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T12:50:44+03:00",
+   "fetched_at": "2026-09-06T12:56:06+03:00",
    "stale": false,
    "games": [
     {
@@ -567,7 +564,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35222219&turnaus=hjk_0031&sarja=U11",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T12:50:44+03:00",
+   "fetched_at": "2026-09-06T12:56:06+03:00",
    "stale": false,
    "games": [
     {
@@ -800,7 +797,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224865&turnaus=hjk_0031&sarja=U12",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T12:50:44+03:00",
+   "fetched_at": "2026-09-06T12:56:06+03:00",
    "stale": false,
    "games": [
     {
@@ -986,7 +983,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35222065&turnaus=hjk_0031&sarja=TU11",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T12:50:44+03:00",
+   "fetched_at": "2026-09-06T12:56:06+03:00",
    "stale": false,
    "games": [
     {
@@ -1114,7 +1111,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224889&turnaus=hjk_0031&sarja=TU12",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T12:50:44+03:00",
+   "fetched_at": "2026-09-06T12:56:06+03:00",
    "stale": false,
    "games": [
     {
@@ -1302,7 +1299,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224802&turnaus=hjk_0031&sarja=TU13",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T12:50:44+03:00",
+   "fetched_at": "2026-09-06T12:56:06+03:00",
    "stale": false,
    "games": [
     {
@@ -2573,8 +2570,8 @@
    "opponent_placeholder": "",
    "opponent_label": "",
    "is_home": false,
-   "result": "",
-   "played": false,
+   "result": "2 - 2",
+   "played": true,
    "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317407"
   },
   {
