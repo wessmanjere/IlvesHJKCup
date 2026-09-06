@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-09-06T09:51:05+03:00",
+ "updated_at": "2026-09-06T09:56:26+03:00",
  "tournament": "hjk_0031",
  "club": "Ilves",
  "series_order": [
@@ -17,7 +17,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224617&turnaus=hjk_0031&sarja=U9",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T09:51:05+03:00",
+   "fetched_at": "2026-09-06T09:56:26+03:00",
    "stale": false,
    "games": [
     {
@@ -292,7 +292,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224897&turnaus=hjk_0031&sarja=U10",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T09:51:05+03:00",
+   "fetched_at": "2026-09-06T09:56:26+03:00",
    "stale": false,
    "games": [
     {
@@ -567,7 +567,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35222219&turnaus=hjk_0031&sarja=U11",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T09:51:05+03:00",
+   "fetched_at": "2026-09-06T09:56:26+03:00",
    "stale": false,
    "games": [
     {
@@ -779,7 +779,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224865&turnaus=hjk_0031&sarja=U12",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T09:51:05+03:00",
+   "fetched_at": "2026-09-06T09:56:26+03:00",
    "stale": false,
    "games": [
     {
@@ -965,7 +965,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35222065&turnaus=hjk_0031&sarja=TU11",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T09:51:05+03:00",
+   "fetched_at": "2026-09-06T09:56:26+03:00",
    "stale": false,
    "games": [
     {
@@ -1093,7 +1093,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224889&turnaus=hjk_0031&sarja=TU12",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T09:51:05+03:00",
+   "fetched_at": "2026-09-06T09:56:26+03:00",
    "stale": false,
    "games": [
     {
@@ -1181,27 +1181,6 @@
      "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4317716"
     },
     {
-     "id": "4349887",
-     "match_id": "4349887",
-     "match_number": "942",
-     "series": "TU12",
-     "stage": "jatko",
-     "date": "6.9.",
-     "date_iso": "2026-09-06",
-     "time": "09:30",
-     "venue": "Töölö PK 3 TN A",
-     "home": "Ilves/T2014",
-     "away": "HJK/sininen",
-     "opponent": "HJK/sininen",
-     "opponent_confirmed": true,
-     "opponent_placeholder": "",
-     "opponent_label": "",
-     "is_home": true,
-     "result": "",
-     "played": false,
-     "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4349887"
-    },
-    {
      "id": "4349891",
      "match_id": "4349891",
      "match_number": "946",
@@ -1221,6 +1200,27 @@
      "result": "",
      "played": false,
      "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4349891"
+    },
+    {
+     "id": "4349887",
+     "match_id": "4349887",
+     "match_number": "942",
+     "series": "TU12",
+     "stage": "jatko",
+     "date": "6.9.",
+     "date_iso": "2026-09-06",
+     "time": "09:30",
+     "venue": "Töölö PK 3 TN A",
+     "home": "Ilves/T2014",
+     "away": "HJK/sininen",
+     "opponent": "HJK/sininen",
+     "opponent_confirmed": true,
+     "opponent_placeholder": "",
+     "opponent_label": "",
+     "is_home": true,
+     "result": "0 - 2",
+     "played": true,
+     "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4349887"
     },
     {
      "id": "4349892",
@@ -1274,7 +1274,7 @@
      "2026-09-06"
     ],
     "time_range": [
-     "09:30",
+     "11:20",
      "11:20"
     ]
    }
@@ -1284,7 +1284,7 @@
    "url": "https://hjkcup.fi/taso/joukkue.php?joukkue=35224802&turnaus=hjk_0031&sarja=TU13",
    "ok": true,
    "error": null,
-   "fetched_at": "2026-09-06T09:51:05+03:00",
+   "fetched_at": "2026-09-06T09:56:26+03:00",
    "stale": false,
    "games": [
     {
@@ -2408,8 +2408,8 @@
    "opponent_placeholder": "",
    "opponent_label": "",
    "is_home": true,
-   "result": "",
-   "played": false,
+   "result": "0 - 2",
+   "played": true,
    "url": "https://hjkcup.fi/taso/ottelu.php?ottelu=4349887"
   },
   {
